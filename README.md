@@ -2,7 +2,9 @@ index_rebuilder.py - the utility rebuilds
 PostgreSQL indexes without table locking and shows related index statistics
 
 Author: Andrey Klychkov aaklychkov@mail.ru
-Version: 2.2.1
+
+Version: 2.3.0
+
 Date: 10-04-2018
 
 ### Requirements:
@@ -45,7 +47,7 @@ Configuration file allows to set up:
 - path to a log file
 - mail notifications about job results
 
-**Important:** During execution DROP/ALTER INDEX commands a table is locked and all queries are not executed until that commands are executed. To avoid an occurrence of queues the statement_timeout value must be setted up into the utility configuration file (initially set to 10 seconds). After a specified time a command will be interrupted (that you'll see in a log) and it needs to be done manually by using psql/PgAdmin, for example. See "Understanding of concurrent index rebuilding" above. You may change the statement_timeout value by using the configuration file.
+**Important:** During execution DROP/ALTER INDEX commands a table is locked and all queries are not executed until that commands are executed. To avoid an occurrence of queues the statement_timeout value must be set up into the utility configuration file (initially set to 10 seconds). After a specified time a command will be interrupted (that you'll see in a log) and it needs to be done manually by using psql/PgAdmin, for example. See "Understanding of concurrent index rebuilding" above. You may change the statement_timeout value by using the configuration file.
 
 ### Mail notification:
 
@@ -61,7 +63,7 @@ Example of event log file entries:
 2018-04-10 14:42:21,856 [INFO] Start to rebuild of test0_name_idx, current size: 16384 bytes
 2018-04-10 14:42:21,857 [INFO] Index is valid
 2018-04-10 14:42:21,860 [INFO] Try: CREATE INDEX CONCURRENTLY new_test0_name_idx ON public.test0 USING btree (name)
-2018-04-10 14:42:21,862 [INFO] Creation has been complited
+2018-04-10 14:42:21,862 [INFO] Creation has been completed
 2018-04-10 14:42:21,862 [INFO] New index new_test0_name_idx is valid, continue
 2018-04-10 14:42:21,862 [INFO] Try to drop index test0_name_idx
 2018-04-10 14:42:21,863 [INFO] Set statement timeout '30s': success
@@ -72,10 +74,27 @@ Example of event log file entries:
 2018-04-10 14:42:21,865 [INFO] test0_name_idx: done. Size (in bytes): prev 16384, fin 16384, diff 0, exec time 0:00:00.009829
 ```
 
+If the --verbose arg has been passed, you'll also see log messages on the console, for example:
+```
+2018-04-12 10:05:40.385696 : Connection to database otp_db established
+2018-04-12 10:05:40.387331 : Start to rebuild of test0_name_idx, current size: 16384 bytes
+2018-04-12 10:05:40.387985 : Index is valid
+2018-04-12 10:05:40.392124 : Try: CREATE INDEX CONCURRENTLY new_test0_name_idx ON public.test0 USING btree (name)
+2018-04-12 10:05:40.395398 : Creation has been completed
+2018-04-12 10:05:40.396066 : New index new_test0_name_idx is valid, continue
+2018-04-12 10:05:40.396235 : Try to drop index test0_name_idx
+2018-04-12 10:05:40.396584 : Set statement timeout '5s': success
+2018-04-12 10:05:40.399109 : Dropping done
+2018-04-12 10:05:40.399246 : Try to rename index new_test0_name_idx to test0_name_idx
+2018-04-12 10:05:40.399944 : Renaming is done
+2018-04-12 10:05:40.400282 : Reset statement timeout to '0': success
+2018-04-12 10:05:40.401007 : test0_name_idx: done. Size (in bytes): prev 16384, fin 16384, diff 0, exec time 0:00:00.015024
+```
+
 ### Synopsis:
 ```
 index_rebuilder.py [-h] -c FILE -d DBNAME [-p PORT] [-H HOST] [-U USER] [-P PASSWD]
-                   [-s | -u SCAN_COUNTER | -i | -r INDEX | -f FILE | --version]
+                   [--verbose] [-s | -u SCAN_COUNTER | -i | -r INDEX | -f FILE | --version]
 ```
 
 **Options:**
@@ -97,6 +116,7 @@ index_rebuilder.py [-h] -c FILE -d DBNAME [-p PORT] [-H HOST] [-U USER] [-P PASS
   -r INDEX, --rebuild INDEX
                         rebuild a specified index
   -f FILE, --file FILE  rebuild indexes from FILE
+  --verbose             print log messages to a console
   --version             show version and exit
 ```
 

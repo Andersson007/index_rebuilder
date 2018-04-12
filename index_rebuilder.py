@@ -28,7 +28,7 @@ from lib.common import ConfParser, Mail
 report_list = []
 
 # Common params:
-__VERSION__ = '2.2.1'
+__VERSION__ = '2.3.0'
 HOSTNAME = socket.gethostname()
 TODAY = datetime.date.today().strftime('%Y%m%d')
 
@@ -50,6 +50,8 @@ def parse_cli_args():
                         help="database user", metavar="USER")
     parser.add_argument("-P", "--passwd", dest="db_passwd",
                         help="db user password", metavar="PASSWD")
+    parser.add_argument("--verbose", dest="verbose", action="store_true",
+                        help="print log messages to a console")
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-s", "--stat", action="store_true",
@@ -135,29 +137,21 @@ if args.db_user:
 if args.db_passwd:
     DB_PASSWD = args.db_passwd
 
+
 #==========================
 #   FUNCTIONS & CLASSES   #
 #==========================
 
-
 def main():
-    # Set up a logging configuration:
-    log_fname = '%s/%s-%s' % (LOG_DIR, LOG_PREF, TODAY)
-    row_format = '%(asctime)s [%(levelname)s] %(message)s'
-    logging.basicConfig(format=row_format, filename=log_fname,
-                        level=logging.INFO)
-    log = logging.getLogger('index_rebuilder')
-
     #
     # If statistics' arguments have been passed:
     #
     if args.stat or args.invalid or args.scan_counter is not None:
         idx_stat = db.GlobIndexStat(args.dbname)
-        idx_stat.set_log(log)
+        #idx_stat.set_log(log)
         idx_stat.get_connect(con_type=DB_CONTYPE, host=DB_HOST,
                              pg_port=DB_PORT, user=DB_USER,
                              passwd=DB_PASSWD)
-
         # Show top of bloated indexes:
         if args.stat:
             idx_stat.print_bloat_top()
@@ -181,11 +175,23 @@ def main():
     mail_report = Mail(ALLOW_MAIL_NOTIFICATION, SMTP_SRV, SMTP_PORT,
                        SMTP_ACC, SMTP_PASS, SENDER, RECIPIENT, SBJ)
 
-    print('Log is collected to %s' % log_fname)
+
+    if args.index or args.filename:
+        # Set up a logging configuration:
+        log_fname = '%s/%s-%s' % (LOG_DIR, LOG_PREF, TODAY)
+        row_format = '%(asctime)s [%(levelname)s] %(message)s'
+        logging.basicConfig(format=row_format, filename=log_fname,
+                        level=logging.INFO)
+        log = logging.getLogger('index_rebuilder')
+
+        print('Log is collected to %s' % log_fname)
 
     if args.index:
         index = db.Index(args.index, args.dbname)
         index.set_log(log)
+        if args.verbose:
+            index.set_verbosity(True)
+
         if index.get_connect(con_type=DB_CONTYPE, host=DB_HOST,
                              pg_port=DB_PORT, user=DB_USER,
                              passwd=DB_PASSWD):
@@ -218,6 +224,9 @@ def main():
 
             index = db.Index(indexname, args.dbname)
             index.set_log(log)
+            if args.verbose:
+                index.set_verbosity(True)
+
             if index.get_connect(con_type=DB_CONTYPE, host=DB_HOST,
                                  pg_port=DB_PORT, user=DB_USER,
                                  passwd=DB_PASSWD):

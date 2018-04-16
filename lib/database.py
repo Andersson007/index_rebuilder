@@ -20,7 +20,7 @@ except ImportError as e:
     print(e, "Hint: use pip3 install pyyaml")
     sys.exit(1)
 
-__version__ = '1.1.0'
+__version__ = '1.1.1'
 
 INF = 0
 ERR = 1
@@ -115,13 +115,12 @@ class _DatBase(object):
         self.lock_query_timeo = timeo
 
     def set_log(self, log):
-        arg_type = type(log)
-        if arg_type is logging.Logger:
+        if isinstance(log, logging.Logger):
             self.log = log
         else:
             err = "_DatBase.set_log() requires "\
                   "an argument as an object of the logging.Logger class, "\
-                  "passed %s" % arg_type
+                  "passed %s" % type(log)
             raise TypeError(err)
             sys.exit(1)
 
@@ -347,7 +346,7 @@ class Index(_Relation):
         return True
 
     def set_idef(idef):
-        if type(idef) is str:
+        if isinstance(idef, str):
             self.idef = idef
         else:
             err = "Index(): index definition "\

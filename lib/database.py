@@ -20,7 +20,7 @@ except ImportError as e:
     print(e, "Hint: use pip3 install pyyaml")
     sys.exit(1)
 
-__version__ = '1.1.1'
+__version__ = '1.1.2'
 
 INF = 0
 ERR = 1
@@ -527,7 +527,7 @@ class Index(_Relation):
             # If index has not been dropped, exit the function:
             msg = '%s: rebuilding FAILED, '\
                   'index is NOT dropped' % self.name
-            self.logger(msg, WARN)
+            self.logger(msg, WRN)
             return False
 
         #

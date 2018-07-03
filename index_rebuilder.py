@@ -3,7 +3,7 @@
 # PostgreSQL indexes without table locking and shows related index statistics
 #
 # Author: Andrey Klychkov aaklychkov@mail.ru
-# Date: 10-04-2018
+# Date: 03-07-2018
 # See https://github.com/Andersson007/index-rebuilder for more info
 #
 # Requirements: Python3+, psycopg2, pyyaml
@@ -28,7 +28,7 @@ from lib.common import ConfParser, Mail
 report_list = []
 
 # Common params:
-__VERSION__ = '2.3.0'
+__VERSION__ = '2.4.0'
 HOSTNAME = socket.gethostname()
 TODAY = datetime.date.today().strftime('%Y%m%d')
 
@@ -56,6 +56,8 @@ def parse_cli_args():
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-s", "--stat", action="store_true",
                        help="show top of bloated indexes")
+    group.add_argument("-n", "--new", action="store_true",
+                       help="show indexes with 'new_' prefix")
     group.add_argument("-u", "--unused", dest="scan_counter",
                        type=int, default=None,
                        help="show unused indexes with SCAN_COUNTER")
@@ -146,7 +148,8 @@ def main():
     #
     # If statistics' arguments have been passed:
     #
-    if args.stat or args.invalid or args.scan_counter is not None:
+    if (args.stat or args.invalid or
+        args.scan_counter or args.new is not None):
         idx_stat = db.GlobIndexStat(args.dbname)
         #idx_stat.set_log(log)
         idx_stat.get_connect(con_type=DB_CONTYPE, host=DB_HOST,
@@ -163,6 +166,9 @@ def main():
         # Show unused indexes:
         if args.scan_counter is not None:
             idx_stat.print_unused(args.scan_counter)
+
+        if args.new:
+            idx_stat.show_idx_with_pref('new_')
 
         idx_stat.close_connect()
         sys.exit(0)

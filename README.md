@@ -3,9 +3,9 @@ PostgreSQL indexes without table locking and shows related index statistics
 
 Author: Andrey Klychkov aaklychkov@mail.ru
 
-Version: 2.3.1
+Version: 2.4.0
 
-Date: 07-05-2018
+Date: 03-07-2018
 
 ### Requirements:
 ```Python3+, psycopg2, pyyaml```
@@ -94,7 +94,7 @@ If the --verbose arg has been passed, you'll also see log messages on the consol
 ### Synopsis:
 ```
 index_rebuilder.py [-h] -c FILE -d DBNAME [-p PORT] [-H HOST] [-U USER] [-P PASSWD]
-                   [--verbose] [-s | -u SCAN_COUNTER | -i | -r INDEX | -f FILE | --version]
+                   [--verbose] [-s | -u SCAN_COUNTER | -i | -n | -r INDEX | -f FILE | --version]
 ```
 
 **Options:**
@@ -113,6 +113,7 @@ index_rebuilder.py [-h] -c FILE -d DBNAME [-p PORT] [-H HOST] [-U USER] [-P PASS
   -u SCAN_COUNTER, --unused SCAN_COUNTER
                         show unused indexes with SCAN_COUNTER
   -i, --invalid         show invalid indexes
+  -n, --new             show indexes with 'new_' prefix
   -r INDEX, --rebuild INDEX
                         rebuild a specified index
   -f FILE, --file FILE  rebuild indexes from FILE

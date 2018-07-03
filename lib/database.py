@@ -20,7 +20,7 @@ except ImportError as e:
     print(e, "Hint: use pip3 install pyyaml")
     sys.exit(1)
 
-__version__ = '1.1.2'
+__version__ = '1.2.0'
 
 INF = 0
 ERR = 1
@@ -215,6 +215,19 @@ class GlobIndexStat(_DatBase):
     """Class for showing index statistics"""
     def __init__(self, dbname):
         super().__init__('stat', dbname)
+
+    def show_idx_with_pref(self, pref):
+        """Print indexes with 'pref' prefix"""
+        self.do_query(sql_templates['IDX_WITH_PREF'] % pref)
+        idxs = self.cursor.fetchall()
+
+        if idxs:
+            print('"%s..." indexes found:' % pref)
+            print('=' * 22)
+            for s in idxs:
+                print('%s' % s[0])
+        else:
+            print('No "%s..." indexes found' % pref)
 
     def print_unused(self, scan_counter=0, size_threshold=0):
         """Print unused indexes with"""

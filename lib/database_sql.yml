@@ -15,3 +15,5 @@ GET_IDXDEF_SQL : "SELECT indexdef FROM pg_indexes WHERE indexname = '%s'"
 CHECK_IDXVALID_SQL : "SELECT i.indisvalid FROM pg_catalog.pg_index AS i WHERE i.indexrelid = (SELECT oid FROM pg_class WHERE relname = '%s')"
 
 GET_IDXCOMMENT_SQL : "SELECT obj_description((SELECT oid FROM pg_class WHERE relname = '%s'))"
+
+IDX_WITH_PREF : "SELECT indexname FROM pg_indexes where indexname like '%s%%'"

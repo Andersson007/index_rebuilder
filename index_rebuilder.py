@@ -28,7 +28,7 @@ from lib.common import ConfParser, Mail
 report_list = []
 
 # Common params:
-__VERSION__ = '2.4.1'
+__VERSION__ = '2.4.2'
 HOSTNAME = socket.gethostname()
 TODAY = datetime.date.today().strftime('%Y%m%d')
 
@@ -149,7 +149,7 @@ def main():
     # If statistics' arguments have been passed:
     #
     if (args.stat or args.invalid or
-        args.scan_counter or args.new is not None):
+        args.scan_counter or args.new):
         idx_stat = db.GlobIndexStat(args.dbname)
         #idx_stat.set_log(log)
         idx_stat.get_connect(con_type=DB_CONTYPE, host=DB_HOST,
@@ -180,7 +180,6 @@ def main():
     # For mail reporting:
     mail_report = Mail(ALLOW_MAIL_NOTIFICATION, SMTP_SRV, SMTP_PORT,
                        SMTP_ACC, SMTP_PASS, SENDER, RECIPIENT, SBJ)
-
 
     if args.index or args.filename:
         # Set up a logging configuration:

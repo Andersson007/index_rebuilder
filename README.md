@@ -3,7 +3,7 @@ PostgreSQL indexes without table locking and shows related index statistics
 
 Author: Andrey Klychkov aaklychkov@mail.ru
 
-Version: 2.4.1
+Version: 2.4.2
 
 Date: 03-07-2018
 

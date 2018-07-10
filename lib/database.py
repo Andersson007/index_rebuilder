@@ -1,6 +1,6 @@
 # database - The PostgreSQL database management library
 # Author: Andrey Klychkov <aaklychkov@mail.ru>
-# Data: 12-04-2018
+# Data: 10-07-2018
 
 import datetime
 import logging
@@ -20,7 +20,7 @@ except ImportError as e:
     print(e, "Hint: use pip3 install pyyaml")
     sys.exit(1)
 
-__version__ = '1.2.0'
+__version__ = '1.2.1'
 
 INF = 0
 ERR = 1
@@ -409,7 +409,7 @@ class Index(_Relation):
         return self.do_service_query(self.__creat_new_cmd)
 
     def drop(self, iname):
-        return self.do_service_query('DROP INDEX %s' % iname)
+        return self.do_service_query('DROP INDEX CONCURRENTLY %s' % iname)
 
     def rename(self, src_iname, final_iname):
         return self.do_service_query('ALTER INDEX %s RENAME TO %s' %
@@ -524,16 +524,6 @@ class Index(_Relation):
         #
         self.logger('Try to drop index %s' % self.name)
 
-        # Index dropping / altering locks a table,
-        # therefore it needs to set allowable statement timeout
-        # for this action in order to prevent queues of queries:
-        if self.set_statement_timeout(self.lock_query_timeo):
-            self.logger("Set statement timeout '%s': success" %
-                        self.lock_query_timeo)
-        else:
-            self.logger("Set statement timeout '%s': failure" %
-                        self.lock_query_timeo, ERR)
-
         if self.drop(self.name):
             self.logger('Dropping done')
         else:
@@ -549,7 +539,17 @@ class Index(_Relation):
         # If the previous step (dropping of a current index)
         # was done successfully,
         # rename the new index to a persistent name
-        # (as the name of the dropped index)
+        # (as the name of the dropped index).
+        # Altering index locks a table,
+        # therefore it needs to set allowable statement timeout
+        # for this action in order to prevent queues of queries:
+        if self.set_statement_timeout(self.lock_query_timeo):
+            self.logger("Set statement timeout '%s': success" %
+                        self.lock_query_timeo)
+        else:
+            self.logger("Set statement timeout '%s': failure" %
+                        self.lock_query_timeo, ERR)
+
         self.logger('Try to rename index %s to %s' % (
                     self.__tmp_name, self.name))
         if self.rename(self.__tmp_name, self.name):

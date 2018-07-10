@@ -3,7 +3,7 @@ PostgreSQL indexes without table locking and shows related index statistics
 
 Author: Andrey Klychkov aaklychkov@mail.ru
 
-Version: 2.4.0
+Version: 2.4.1
 
 Date: 03-07-2018
 
@@ -37,7 +37,7 @@ For concurrent rebuilding of a postgresql index
 6) create a new index by using a creation command
 7) add a comment if an old index have it
 8) check new index validity
-9) if a new index is valid, drop an old index
+9) if a new index is valid, drop an old index in concurrently mode
 10) rename a new index like an old index
 ```
 ### Configuration:
@@ -47,7 +47,7 @@ Configuration file allows to set up:
 - path to a log file
 - mail notifications about job results
 
-**Important:** During execution DROP/ALTER INDEX commands a table is locked and all queries are not executed until that commands are executed. To avoid an occurrence of queues the statement_timeout value must be set up into the utility configuration file (initially set to 10 seconds). After a specified time a command will be interrupted (that you'll see in a log) and it needs to be done manually by using psql/PgAdmin, for example. See "Understanding of concurrent index rebuilding" above. You may change the statement_timeout value by using the configuration file.
+**Important:** During execution ALTER INDEX commands a table is locked and all queries are not executed until that commands are executed. To avoid an occurrence of queues the statement_timeout value must be set up into the utility configuration file (initially set to 10 seconds). After a specified time a command will be interrupted (that you'll see in a log) and it needs to be done manually by using psql/PgAdmin, for example. See "Understanding of concurrent index rebuilding" above. You may change the statement_timeout value by using the configuration file.
 
 ### Mail notification:
 
@@ -66,8 +66,8 @@ Example of event log file entries:
 2018-04-10 14:42:21,862 [INFO] Creation has been completed
 2018-04-10 14:42:21,862 [INFO] New index new_test0_name_idx is valid, continue
 2018-04-10 14:42:21,862 [INFO] Try to drop index test0_name_idx
-2018-04-10 14:42:21,863 [INFO] Set statement timeout '30s': success
 2018-04-10 14:42:21,864 [INFO] Dropping done
+2018-04-10 14:42:21,864 [INFO] Set statement timeout '30s': success
 2018-04-10 14:42:21,864 [INFO] Try to rename index new_test0_name_idx to test0_name_idx
 2018-04-10 14:42:21,864 [INFO] Renaming is done
 2018-04-10 14:42:21,864 [INFO] Reset statement timeout to '0': success
@@ -83,8 +83,8 @@ If the --verbose arg has been passed, you'll also see log messages on the consol
 2018-04-12 10:05:40.395398 : Creation has been completed
 2018-04-12 10:05:40.396066 : New index new_test0_name_idx is valid, continue
 2018-04-12 10:05:40.396235 : Try to drop index test0_name_idx
-2018-04-12 10:05:40.396584 : Set statement timeout '5s': success
 2018-04-12 10:05:40.399109 : Dropping done
+2018-04-12 10:05:40.399184 : Set statement timeout '5s': success
 2018-04-12 10:05:40.399246 : Try to rename index new_test0_name_idx to test0_name_idx
 2018-04-12 10:05:40.399944 : Renaming is done
 2018-04-12 10:05:40.400282 : Reset statement timeout to '0': success

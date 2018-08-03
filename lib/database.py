@@ -1,6 +1,6 @@
 # database - The PostgreSQL database management library
 # Author: Andrey Klychkov <aaklychkov@mail.ru>
-# Data: 10-07-2018
+# Date: 10-07-2018
 
 import datetime
 import logging

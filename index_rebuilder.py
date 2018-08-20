@@ -3,7 +3,7 @@
 # PostgreSQL indexes without table locking and shows related index statistics
 #
 # Author: Andrey Klychkov aaklychkov@mail.ru
-# Date: 10-07-2018
+# Date: 20-08-2018
 # See https://github.com/Andersson007/index-rebuilder for more info
 #
 # Requirements: Python3+, psycopg2, pyyaml
@@ -28,7 +28,7 @@ from lib.common import ConfParser, Mail
 report_list = []
 
 # Common params:
-__VERSION__ = '2.4.2'
+__VERSION__ = '2.4.3'
 HOSTNAME = socket.gethostname()
 TODAY = datetime.date.today().strftime('%Y%m%d')
 

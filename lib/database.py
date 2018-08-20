@@ -1,6 +1,6 @@
 # database - The PostgreSQL database management library
 # Author: Andrey Klychkov <aaklychkov@mail.ru>
-# Date: 10-07-2018
+# Date: 20-08-2018
 
 import datetime
 import logging
@@ -20,7 +20,7 @@ except ImportError as e:
     print(e, "Hint: use pip3 install pyyaml")
     sys.exit(1)
 
-__version__ = '1.2.1'
+__version__ = '1.2.2'
 
 INF = 0
 ERR = 1
@@ -144,7 +144,7 @@ class _DatBase(object):
                 params = 'dbname=%s user=%s '\
                          'password=%s' % (self.dbname, user, passwd)
         elif con_type == 'network':
-            params = 'host=%s port=%s dbname=%s'\
+            params = 'host=%s port=%s dbname=%s '\
                      'user=%s password=%s' % (host, pg_port,
                                               self.dbname, user, passwd)
         else:

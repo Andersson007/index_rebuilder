@@ -3,9 +3,9 @@ PostgreSQL indexes without table locking and shows related index statistics
 
 Author: Andrey Klychkov aaklychkov@mail.ru
 
-Version: 2.4.2
+Version: 2.4.3
 
-Date: 03-07-2018
+Date: 20-08-2018
 
 ### Requirements:
 ```Python3+, psycopg2, pyyaml```

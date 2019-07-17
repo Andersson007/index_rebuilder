@@ -12,52 +12,51 @@ Date: 20-08-2018
 
 Also needs to create a configuration file (see the index_rebuilder.conf.example)
 
-SQL templates are stored into the index_rebuilder_sql.yml
+SQL templates are stored in index_rebuilder_sql.yml
 
 ### Descriprion:
-index_re.py - rebuild postgresql indexes (concurrently) or show:
+index_re.py - rebuilds postgresql indexes (concurrently) or shows:
 ```
 1) top of bloated indexes (may be you want to know which indexes should be rebuilt first)
-2) invalid indexes (check them after mass rebuilding for your confidence)
-3) unused indexes (perhaps unused bloated indexes will be found, so be better
-   if you remove them at all)
+2) invalid indexes (it's a good idea to check them after mass rebuilding)
+3) unused indexes (perhaps unused bloated indexes will be found, so better if you remove them at all)
 ```
-### Understanding of the concurrent index rebuilding:
+### Understanding concurrent index rebuilding:
 
-For concurrent rebuilding of a postgresql index
-(without a table locking) needs to do the steps below:
+To rebuild a postgresql index in concurrent mode
+(without a table locking), it needs to do the steps below:
 ```
-1) check validity of a current index
-2) get an index definition from the pg_indexes view;
-3) get an index comment if exists;
+1) check validity of the current index
+2) get the index definition from pg_indexes view;
+3) get the index comment if exists;
 4) realize a temporary name for a new index;
-5) make a creation command by using an index definition
-   and a temporary index name, add the expression 'CONCURRENTLY'
+5) make the creation command by using the index definition
+   and the temporary index name, add expression 'CONCURRENTLY'
    after 'CREATE INDEX'
-6) create a new index by using a creation command
-7) add a comment if an old index have it
+6) create the new index by using the creation command
+7) add a comment if the old index has it
 8) check new index validity
-9) if a new index is valid, drop an old index in concurrently mode
-10) rename a new index like an old index
+9) if the new index is valid, drop the old index in concurrent mode
+10) rename the new index like the old index
 ```
 ### Configuration:
 
 Configuration file allows to set up:
-- statement timeout of dropping\altering commands, otherwise a table can be locked indefinitely
-- path to a log file
+- statement timeout for dropping\altering commands, otherwise the table can be locked indefinitely
+- path to the log file
 - mail notifications about job results
 
-**Important:** During execution ALTER INDEX commands a table is locked and all queries are not executed until that commands are executed. To avoid an occurrence of queues the statement_timeout value must be set up into the utility configuration file (initially set to 10 seconds). After a specified time a command will be interrupted (that you'll see in a log) and it needs to be done manually by using psql/PgAdmin, for example. See "Understanding of concurrent index rebuilding" above. You may change the statement_timeout value by using the configuration file.
+**Important:** During execution ALTER INDEX commands a table is locked and all queries won't be executed until that the commands are in progress. To avoid queries queues, the statement_timeout value must be set up into the utility configuration file (initially set to 10 seconds). After specified time is over, the command will be interrupted (that you'll see in the log) and it needs to be done manually by using psql/PgAdmin, for example. See "Understanding concurrent index rebuilding" above. You may change the statement_timeout value by adding a desired value to the configuration file.
 
 ### Mail notification:
 
-If mail notifications are allowed, you'll see reports that contents the line as below for each of rebuilded indexes:
+If mail notifications are allowed, you'll see a job report that contents the line like below for each rebuilded index:
 ```
 index_name: done. Size (in bytes): prev 16384, fin 16383, diff 1, exec time 0:00:00.069175
 ```
 ### Logging:
 
-Example of event log file entries:
+Example event log file entries:
 ```
 2018-04-10 14:42:21,855 [INFO] Connection to database otp_db established
 2018-04-10 14:42:21,856 [INFO] Start to rebuild of test0_name_idx, current size: 16384 bytes
@@ -117,14 +116,14 @@ index_rebuilder.py [-h] -c FILE -d DBNAME [-p PORT] [-H HOST] [-U USER] [-P PASS
   -r INDEX, --rebuild INDEX
                         rebuild a specified index
   -f FILE, --file FILE  rebuild indexes from FILE
-  --verbose             print log messages to a console
+  --verbose             print log messages to the console
   --version             show version and exit
 ```
 
 
 **Examples:**
 
-Show top of bloated indexes:
+Show the top of bloated indexes:
 ```
 ./index_rebuilder.py -d mydbname -s -c /path/to/file.conf
 ```
@@ -143,7 +142,7 @@ Rebuild some index:
 ./index_rebuilder.py -d mydbname -r my_bloated_index -c /path/to/file.conf
 ```
 
-Rebuild indexes from file:
+Rebuild indexes from a file:
 ```
 ./index_rebuilder.py -d mydbname -f file_with_indexnames -c /path/to/file.conf
 ```

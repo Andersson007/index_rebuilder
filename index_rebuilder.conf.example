@@ -1,14 +1,14 @@
-# statement timeout of drop/alter index:
+# statement timeout for drop/alter index:
 lock_query_timeo = 5s
 
 log_dir = /tmp
 log_pref = index-re.log
 
-# allow mail notification (set not null):
+# allow mail notifications (set not null):
 mail_allow  = 0
 # default mail subject:
 mail_subject = hostname.lan: reindex status
-# mail srv conn param:
+# mail srv conn params:
 smtp_srv = smtp.gmail.com
 smtp_port = 587
 # send mail by mail account:

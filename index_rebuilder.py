@@ -35,7 +35,7 @@ TODAY = datetime.date.today().strftime('%Y%m%d')
 
 def parse_cli_args():
     parser = argparse.ArgumentParser(
-        description="rebuild indexes and show related index statistic")
+        description="rebuilds indexes and shows related index statistic")
 
     parser.add_argument("-c", "--config", dest="config", required=True,
                         help="path to configuration FILE", metavar="FILE",
@@ -51,7 +51,7 @@ def parse_cli_args():
     parser.add_argument("-P", "--passwd", dest="db_passwd",
                         help="db user password", metavar="PASSWD")
     parser.add_argument("--verbose", dest="verbose", action="store_true",
-                        help="print log messages to a console")
+                        help="print log messages to the console")
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-s", "--stat", action="store_true",
@@ -75,10 +75,10 @@ def parse_cli_args():
 args = parse_cli_args()
 
 # ======================================
-# Parsing of configuration files section
+# Parsing the configuration files section
 # ======================================
 
-# Allowable parameters list in a config file:
+# Allowable parameters list in the config file:
 params = ['lock_query_timeo',
           'log_dir',
           'log_pref',
@@ -97,7 +97,7 @@ conf_parser.set_config(args.config)
 configuration = conf_parser.get_options()
 
 # Main params:
-# Statement timeout (in this util for drop/alter sql only):
+# Statement timeout (in this util used for drop/alter SQL only):
 LOCK_QUERY_TIMEO = '0'
 if configuration['lock_query_timeo']:
     LOCK_QUERY_TIMEO = configuration['lock_query_timeo']
@@ -116,9 +116,9 @@ SMTP_PORT = configuration['smtp_port']
 SMTP_PASS = configuration['smtp_pass']
 SENDER = configuration['mail_sender']
 
-# DB defaults below.
+# The DB defaults are below.
 # In the DatBase.get_connect() class method
-# a database name for connection is 'postgres' by default):
+# the database name for connection is 'postgres' by default):
 DB_CONTYPE = 'u_socket'
 DB_USER = 'postgres'
 DB_PASSWD = ''
@@ -146,7 +146,7 @@ if args.db_passwd:
 
 def main():
     #
-    # If statistics' arguments have been passed:
+    # If stat argument is passed:
     #
     if (args.stat or args.invalid or
         args.scan_counter or args.new):
@@ -182,14 +182,14 @@ def main():
                        SMTP_ACC, SMTP_PASS, SENDER, RECIPIENT, SBJ)
 
     if args.index or args.filename:
-        # Set up a logging configuration:
+        # Set up the logging configuration:
         log_fname = '%s/%s-%s' % (LOG_DIR, LOG_PREF, TODAY)
         row_format = '%(asctime)s [%(levelname)s] %(message)s'
         logging.basicConfig(format=row_format, filename=log_fname,
                         level=logging.INFO)
         log = logging.getLogger('index_rebuilder')
 
-        print('Log is collected to %s' % log_fname)
+        print('Log will be collected into %s' % log_fname)
 
     if args.index:
         index = db.Index(args.index, args.dbname)
@@ -206,14 +206,14 @@ def main():
             if stat:
                 report_list.append(stat+'\n')
             else:
-                report_list.append('Rebuilding of %s failed. '
+                report_list.append('Rebuilding %s failed. '
                                    'See %s for more info\n' %
                                    (args.index, log_fname))
         else:
             report_list.append('Connection to the database '
                                '%s failed\n' % args.dbname)
 
-    # Rebuild indexes by using index names from a passed file:
+    # Rebuild indexes by using index names from the passed file:
     elif args.filename:
         try:
             fp = open(args.filename, 'r')
@@ -241,7 +241,7 @@ def main():
                 if stat:
                     report_list.append(stat+'\n')
                 else:
-                    report_list.append('Rebuilding of %s failed. '
+                    report_list.append('Rebuilding %s failed. '
                                        'See %s for more info\n' %
                                        (args.index, log_fname))
             else:

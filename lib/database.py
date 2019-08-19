@@ -20,7 +20,7 @@ except ImportError as e:
     print(e, "Hint: use pip3 install pyyaml")
     sys.exit(1)
 
-__version__ = '1.2.2'
+__version__ = '1.2.3'
 
 INF = 0
 ERR = 1
@@ -348,6 +348,7 @@ class Index(_Relation):
         self.icomment = ''
         self.__tmp_name = ''
         self.__create_new_cmd = ''
+        self.itable = ''
 
     def get_indexdef(self):
         """Get index definition - in fact its creation command"""
@@ -383,6 +384,17 @@ class Index(_Relation):
         """Get a comment of index if it exists"""
         self.do_query(sql_templates['GET_IDXCOMMENT_SQL'] % self.name)
         self.icomment = self.cursor.fetchone()[0]
+
+    def get_indextable(self):
+        """Get table name."""
+        query = "SELECT tablename FROM pg_indexes WHERE indexname = '%s'" % self.name
+        self.do_query(query)
+        self.itable = self.cursor.fetchone()[0]
+
+    def analyze_indextable(self):
+        """Analyze index table."""
+        self.get_indextable()
+        return self.do_service_query('ANALYZE %s' % self.itable)
 
     def __get_tmp_name(self, pref):
         """Make a temporary name
@@ -424,7 +436,7 @@ class Index(_Relation):
         # For exec time statistics:
         start_time = datetime.datetime.now()
 
-        # If a relation does not exist or if it isn't an index,
+        # If the relation does not exist or if it isn't an index,
         # exit the function:
         relkind = self.get_relkind()
         if not relkind:
@@ -443,7 +455,7 @@ class Index(_Relation):
                     'current size: %s bytes' % (self.name, prev_size))
 
         #
-        # 1. Check validity of a current index
+        # 1. Check validity of the current index
         #
         if not self.check_validity():
             msg = '%s: index is invalid. Check it' % self.name
@@ -453,12 +465,12 @@ class Index(_Relation):
             self.logger('Index is valid')
 
         #
-        # 2. Get current index definition
+        # 2. Get the current index definition
         #
         self.get_indexdef()
 
         #
-        # 3. Get an index comment if it exists
+        # 3. Get the index comment if it exists
         #
         self.get_indexcomment()
 
@@ -467,7 +479,7 @@ class Index(_Relation):
         #
         self.__get_tmp_name('new_')
 
-        # If a relation does not exist or if it's not an index,
+        # If the relation does not exist or if it's not an index,
         # exit the function:
         relkind = self.get_relkind(self.__tmp_name)
         if relkind:
@@ -481,12 +493,12 @@ class Index(_Relation):
             return False
 
         #
-        # 5. Make a creation command for a new index
+        # 5. Make the creation command
         #
         self.__make_creat_new_cmd()
 
         #
-        # 6. Create a new index
+        # 6. Create the new index
         #
         self.logger('Try: %s' % self.__creat_new_cmd)
         if self.create_new():
@@ -497,7 +509,17 @@ class Index(_Relation):
             return False
 
         #
-        # 7. Add a comment on a new index if it exists on an old index
+        # 7. ANALYZE table
+        #
+        if self.analyze_indextable():
+            self.logger('Analyze done')
+        else:
+            msg = '%s: ANALYZE FAILED' % self.__tmp_name
+            self.logger(msg, ERR)
+            return False
+
+        #
+        # 8. Add the comment on the new index if it exists on the old index
         #
         if self.icomment:
             self.logger("Add comment: '%s'" % self.icomment)
@@ -508,7 +530,7 @@ class Index(_Relation):
                 self.logger(msg, WRN)
 
         #
-        # 8. Check validity of a new index
+        # 9. Check validity of the new index
         #
         if not self.check_validity(self.__tmp_name):
             # If the index is invalid, exit the function
@@ -520,7 +542,7 @@ class Index(_Relation):
             self.logger('New index %s is valid, continue' % self.__tmp_name)
 
         #
-        # 9. Drop an old index
+        # 10. Drop the old index
         #
         self.logger('Try to drop index %s' % self.name)
 
@@ -534,9 +556,9 @@ class Index(_Relation):
             return False
 
         #
-        # 10. Rename a new index
+        # 11. Rename the new index
         #
-        # If the previous step (dropping of a current index)
+        # If the previous step (dropping of the current index)
         # was done successfully,
         # rename the new index to a persistent name
         # (as the name of the dropped index).
@@ -560,7 +582,7 @@ class Index(_Relation):
             return False
 
         #
-        # Reset a statement timeout that was established previously:
+        # Reset the statement timeout that was established previously:
         #
         if self.set_statement_timeout('0'):
             self.logger("Reset statement timeout to '0': success")
